@@ -1,0 +1,61 @@
+name: Audio Effect Bot Runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      restart:
+        description: 'Boty täzeden işlet'
+        required: false
+        default: 'true'
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Kody github-dan çek
+      uses: actions/checkout@v3
+      
+    - name: Python gurnama
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Gerekli paketleri gurnama
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ffmpeg libsndfile1
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Boty işlet
+      run: |
+        echo "🤖 Audio Effect Bot başlanýar..."
+        echo "Bot Token: ${{ secrets.BOT_TOKEN }}"
+        
+        # Boty 5 sekunt soň işlet
+        sleep 5
+        
+        # Boty 1 sagat dowamly işlet
+        timeout 3600 python audio_effect_bot.py &
+        BOT_PID=$!
+        
+        # Botyň işlýändigine göz ýetirmek
+        sleep 10
+        
+        if ps -p $BOT_PID > /dev/null; then
+          echo "✅ Bot işleýär! PID: $BOT_PID"
+          # Bot işlän wagty gözlemek
+          wait $BOT_PID
+          echo "🔄 Bot tamamlandy"
+        else
+          echo "❌ Bot işlemedi!"
+          exit 1
+        fi
+      
+    - name: Bot çykýança göz ýetir
+      if: always()
+      run: |
+        echo "📊 Bot loglary:"
+        ps aux | grep python
+        echo "✅ Workflow tamamlandy"
