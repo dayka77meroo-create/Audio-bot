@@ -37,7 +37,7 @@ jobs:
         sleep 5
         
         # Boty 1 sagat dowamly işlet
-        timeout 3600 python audio_effect_bot.py &
+        timeout 3600 python bot.py &
         BOT_PID=$!
         
         # Botyň işlýändigine göz ýetirmek
